@@ -332,10 +332,10 @@
     ramda "^0.26.1"
     zalgo-promise "1.0.28"
 
-"@notabug/gun-sear@^0.0.14":
-  version "0.0.14"
-  resolved "https://registry.yarnpkg.com/@notabug/gun-sear/-/gun-sear-0.0.14.tgz#1e8f178c175b443b52379734f43794684f7db811"
-  integrity sha512-R1FRfXuf3Q+xJ1R/sW9qG3Cp9BqCWukUSNIBH0ySMmaenxIVQFL7xGwxFFPU5G1rqwKxGS9H8Ihqqi2PwmuPlA==
+"@notabug/gun-sear@^0.0.15":
+  version "0.0.15"
+  resolved "https://registry.yarnpkg.com/@notabug/gun-sear/-/gun-sear-0.0.15.tgz#69aa0eaa2fbb4a8314df27387e628bd04c85f818"
+  integrity sha512-Jlbnq9mvqL9PEC/lTZe1zyOY8f33MXIRxhf9urf7fLz82L+ifDeiibPa2MXpBauxzOuhDdNtpLKUUy8DH9OMng==
   dependencies:
     "@peculiar/webcrypto" "^1.0.19"
     "@types/window-or-global" "^1.0.0"
@@ -360,10 +360,10 @@
     ramda "^0.26.1"
     route-parser "^0.0.5"
 
-"@notabug/peer@^0.32.2":
-  version "0.32.2"
-  resolved "https://registry.yarnpkg.com/@notabug/peer/-/peer-0.32.2.tgz#cabd9deec563f862de3514eb8c936cc54c9a5114"
-  integrity sha512-gEK0E7tTPyqkkJjgG659CO2wq/k+bWPJHBIHm2WJmXB5+Zr/lYxnE0+I4Zv4mDpJMvlMS9VytcZO7J54vHxVOQ==
+"@notabug/peer@^0.33.0":
+  version "0.33.0"
+  resolved "https://registry.yarnpkg.com/@notabug/peer/-/peer-0.33.0.tgz#a4896e84faca2d85f635c35e787d57298d0a75c0"
+  integrity sha512-AvxDi+DR6zqUfc7dxHMmViA795/mybTOqrO5yMy49S4a0r/ibFkfeKVzIvDYXtPh3/z7AyMF9jwVoY/klx0jzA==
   dependencies:
     "@notabug/gun-scope" "^0.10.0"
     "@notabug/gun-suppressor" "^0.2.2"
