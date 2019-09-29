@@ -1,7 +1,7 @@
 import { sign } from "@notabug/gun-sear"
-import { Validation } from "@notabug/peer"
 import socketCluster from "socketcluster-client"
 import Gun from "gun"
+import { Validation } from "./Validation"
 
 const DEFAULT_OPTS = {
   socketCluster: {

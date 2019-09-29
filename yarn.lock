@@ -360,14 +360,12 @@
     ramda "^0.26.1"
     route-parser "^0.0.5"
 
-"@notabug/peer@^0.33.0":
-  version "0.33.0"
-  resolved "https://registry.yarnpkg.com/@notabug/peer/-/peer-0.33.0.tgz#a4896e84faca2d85f635c35e787d57298d0a75c0"
-  integrity sha512-AvxDi+DR6zqUfc7dxHMmViA795/mybTOqrO5yMy49S4a0r/ibFkfeKVzIvDYXtPh3/z7AyMF9jwVoY/klx0jzA==
+"@notabug/peer@^0.36.0":
+  version "0.36.0"
+  resolved "https://registry.yarnpkg.com/@notabug/peer/-/peer-0.36.0.tgz#d50473cac34d3bd1c167f7aa97a5af20cbf22911"
+  integrity sha512-To57s0Fm0KFCpDxePkQ3Kh4Q0YWcdXxyylIUYr2Dfy5Mz6zFgTgL4gJZKGTcy/rz04N1gmYIuf5CeJay7j7X3w==
   dependencies:
     "@notabug/gun-scope" "^0.10.0"
-    "@notabug/gun-suppressor" "^0.2.2"
-    "@notabug/gun-suppressor-sear" "^0.3.1"
     argon2 "^0.21.0"
     fast-memoize "^2.5.1"
     object-hash "^1.3.1"
