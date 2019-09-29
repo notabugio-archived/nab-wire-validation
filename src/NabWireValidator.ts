@@ -1,4 +1,5 @@
 import { sign } from "@notabug/gun-sear"
+import { GunProcessQueue } from "@notabug/chaingun"
 import socketCluster from "socketcluster-client"
 import Gun from "gun"
 import { Validation } from "./Validation"
@@ -19,6 +20,9 @@ const DEFAULT_OPTS = {
 export class NabWireValidator {
   suppressor: any
   socket: any
+  validationQueue: GunProcessQueue
+  use: (x: any) => any | null
+  unuse: (x: any) => any | null
 
   constructor(options = DEFAULT_OPTS) {
     this.suppressor = Validation.createSuppressor(Gun)
@@ -27,6 +31,12 @@ export class NabWireValidator {
     this.socket.on("error", err => {
       console.error("SC Connection Error", err.stack, err)
     })
+
+    this.validationQueue = new GunProcessQueue()
+    this.validationQueue.completed.on(this.onReceivePut.bind(this))
+
+    this.use = this.validationQueue.middleware.use
+    this.unuse = this.validationQueue.middleware.unuse
 
     this.validateGets()
     this.validatePuts()
@@ -73,7 +83,10 @@ export class NabWireValidator {
   validatePuts() {
     const channel = this.socket.subscribe("gun/put", { waitForAuth: true })
     channel.on("subscribe", () => {
-      channel.watch(this.onReceivePut.bind(this))
+      channel.watch(msg => {
+        this.validationQueue.enqueue(msg)
+        this.validationQueue.process()
+      })
     })
   }
 
@@ -93,6 +106,7 @@ export class NabWireValidator {
   }
 
   onReceivePut(msg: any) {
+    if (!msg) return
     this.suppressor
       .validate(msg)
       .then(isValid => {
