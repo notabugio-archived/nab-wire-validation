@@ -1,3 +1,6 @@
-import { NabWireValidator } from "./NabWireValidator"
+import { NabWireValidator } from './NabWireValidator'
 
-new NabWireValidator()
+const validator = new NabWireValidator()
+
+validator.validateGets()
+validator.validatePuts()

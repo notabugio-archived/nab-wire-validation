@@ -1,35 +1,31 @@
-import { sign } from "@notabug/gun-sear"
-import { GunProcessQueue } from "@notabug/chaingun"
-import socketCluster from "socketcluster-client"
-import Gun from "gun"
-import { Validation } from "./Validation"
+import { GunProcessQueue } from '@notabug/chaingun'
+import { sign } from '@notabug/gun-sear'
+import Gun from 'gun'
+import socketCluster from 'socketcluster-client'
+import { Validation } from './Validation'
 
 const DEFAULT_OPTS = {
   socketCluster: {
-    hostname: process.env.GUN_SC_HOST || "localhost",
-    port: process.env.GUN_SC_PORT || "4444",
     autoReconnect: true,
-    autoReconnectOptions: {
-      initialDelay: 1,
-      randomness: 100,
-      maxDelay: 500
-    }
+    hostname: process.env.GUN_SC_HOST || 'localhost',
+    port: process.env.GUN_SC_PORT || '4444'
   }
 }
 
 export class NabWireValidator {
-  suppressor: any
-  socket: any
-  validationQueue: GunProcessQueue
-  use: (x: any) => any | null
-  unuse: (x: any) => any | null
+  public readonly use: (x: any) => any | null
+  public readonly unuse: (x: any) => any | null
+  protected readonly suppressor: any
+  protected readonly socket: any
+  protected readonly validationQueue: GunProcessQueue
 
   constructor(options = DEFAULT_OPTS) {
     this.suppressor = Validation.createSuppressor(Gun)
     this.socket = socketCluster.create(options.socketCluster)
-    this.socket.on("connect", this.onConnected.bind(this))
-    this.socket.on("error", err => {
-      console.error("SC Connection Error", err.stack, err)
+    this.socket.on('connect', this.onConnected.bind(this))
+    this.socket.on('error', err => {
+      // tslint:disable-next-line: no-console
+      console.error('SC Connection Error', err.stack, err)
     })
 
     this.validationQueue = new GunProcessQueue()
@@ -38,51 +34,44 @@ export class NabWireValidator {
     this.use = this.validationQueue.middleware.use
     this.unuse = this.validationQueue.middleware.unuse
 
-    this.validateGets()
-    this.validatePuts()
+    setInterval(
+      () => this.authenticate(),
+      1000*60*30
+    )
   }
 
-  onConnected() {
-    if (process.env.GUN_SC_PUB && process.env.GUN_SC_PRIV) {
-      this.authenticate(process.env.GUN_SC_PUB, process.env.GUN_SC_PRIV)
-        .then(() => console.log(`Logged in as ${process.env.GUN_SC_PUB}`))
-        .catch(err => console.error("Error logging in:", err.stack || err))
-    } else {
-      console.error("Missing GUN_SC_PUB/GUN_SC_PRIV env variables")
-      process.exit(1)
-    }
-  }
-
-  authenticate(pub: string, priv: string) {
+  public authenticateAs(pub: string, priv: string): Promise<void> {
     const id = this.socket!.id
     const timestamp = new Date().getTime()
     const challenge = `${id}/${timestamp}`
 
-    return sign(challenge, { pub, priv }, { raw: true }).then(
-      proof =>
-        new Promise((ok, fail) => {
-          this.socket!.emit(
-            "login",
-            {
-              pub,
-              proof
-            },
-            (err: any) => (err ? fail(err) : ok())
-          )
-        })
+    return sign(challenge, { pub, priv }, { raw: true }).then(proof =>
+      new Promise((ok, fail) => {
+        this.socket!.emit(
+          'login',
+          {
+            proof,
+            pub
+          },
+          (err: any) => (err ? fail(err) : ok())
+        )
+      }).then(() => {
+        // tslint:disable-next-line: no-console
+        console.log('socket id', this.socket.id)
+      })
     )
   }
 
-  validateGets() {
-    const channel = this.socket.subscribe("gun/get", { waitForAuth: true })
-    channel.on("subscribe", () => {
+  public validateGets(): void {
+    const channel = this.socket.subscribe('gun/get', { waitForAuth: true })
+    channel.on('subscribe', () => {
       channel.watch(this.onReceiveGet.bind(this))
     })
   }
 
-  validatePuts() {
-    const channel = this.socket.subscribe("gun/put", { waitForAuth: true })
-    channel.on("subscribe", () => {
+  public validatePuts(): void {
+    const channel = this.socket.subscribe('gun/put', { waitForAuth: true })
+    channel.on('subscribe', () => {
       channel.watch(msg => {
         this.validationQueue.enqueue(msg)
         this.validationQueue.process()
@@ -90,34 +79,58 @@ export class NabWireValidator {
     })
   }
 
-  onReceiveGet(msg: any) {
+  protected onReceiveGet(msg: any): void {
     this.suppressor
       .validate(msg)
       .then(isValid => {
         if (isValid) {
-          this.socket.publish("gun/get/validated", msg)
+          this.socket.publish('gun/get/validated', msg)
         } else {
-          throw new Error("Invalid get")
+          throw new Error('Invalid get')
         }
       })
       .catch(error =>
-        console.error("Error validating get", error.stack || error, msg)
+        // tslint:disable-next-line: no-console
+        console.error('Error validating get', error.stack || error, msg)
       )
   }
 
-  onReceivePut(msg: any) {
-    if (!msg) return
+  protected onReceivePut(msg: any): void {
+    if (!msg) {
+      return
+    }
     this.suppressor
       .validate(msg)
       .then(isValid => {
         if (isValid) {
-          this.socket.publish("gun/put/validated", msg)
+          this.socket.publish('gun/put/validated', msg)
         } else {
-          throw new Error("Invalid put")
+          throw new Error('Invalid put')
         }
       })
       .catch(error =>
-        console.error("Error validating put", error.stack || error, msg)
+        // tslint:disable-next-line: no-console
+        console.error('Error validating put', error.stack || error, msg)
       )
+  }
+
+  protected authenticate() : void {
+    if (process.env.GUN_SC_PUB && process.env.GUN_SC_PRIV) {
+      this.authenticateAs(process.env.GUN_SC_PUB, process.env.GUN_SC_PRIV)
+        // tslint:disable-next-line: no-console
+        .then(() => console.log(`Logged in as ${process.env.GUN_SC_PUB}`))
+        // tslint:disable-next-line: no-console
+        .catch(err => console.error('Error logging in:', err.stack || err))
+    } else {
+      // tslint:disable-next-line: no-console
+      console.error('Missing GUN_SC_PUB/GUN_SC_PRIV env variables')
+      process.exit(1)
+    }
+
+  }
+
+
+  protected onConnected(): void {
+    this.authenticate()
   }
 }
