@@ -367,10 +367,10 @@
     ramda "^0.26.1"
     route-parser "^0.0.5"
 
-"@notabug/peer@^0.39.2":
-  version "0.39.2"
-  resolved "https://registry.yarnpkg.com/@notabug/peer/-/peer-0.39.2.tgz#0d7eb773e7379698f3925ad2511e7fcdcd87fab8"
-  integrity sha512-sRyBeWvIYhHN0XWJL8WQgrOjcW7hrg+AFbXMmvEHU+15TpZsgmAo3ZaBTHr0Bfh4SxarnUuTyGJf6Fe3JyxsZw==
+"@notabug/peer@^0.39.3":
+  version "0.39.3"
+  resolved "https://registry.yarnpkg.com/@notabug/peer/-/peer-0.39.3.tgz#8ee5fb5fabb5f092a866bf49711267628df0c0a5"
+  integrity sha512-kI/OG6ktGygS17OzNI6tVMiOSxzhgmPzAcsjo41aLejX8Ayrt+aUh9STNMNc/jL9yfdYaAjffsMYLPb7DJGCTw==
   dependencies:
     "@notabug/gun-scope" "^0.10.2"
     argon2 "^0.21.0"
